@@ -5,6 +5,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "sysinfo.h"
 
 uint64
 sys_exit(void)
@@ -98,5 +99,24 @@ sys_trace(void)
   int mask;
   argint(0, &mask);
   myproc()->trace_mask = mask;
+  return 0;
+}
+
+uint64
+sys_sysinfo(void)
+{
+  uint64 addr;
+  struct sysinfo info;
+
+  argaddr(0, &addr);
+  memset(&info, 0, sizeof(info));
+  info.freemem = freemem_bytes();
+  info.nproc = nproc_count();
+  safestrcpy(info.student_id, "24300240168", sizeof(info.student_id));
+
+  printf("my student number is %s\n", info.student_id);
+
+  if (copyout(myproc()->pagetable, addr, (char *)&info, sizeof(info)) < 0)
+    return -1;
   return 0;
 }

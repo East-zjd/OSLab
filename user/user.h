@@ -23,6 +23,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int trace(int);
+struct sysinfo;
 
 // ulib.c
 int stat(const char*, struct stat*);
@@ -40,3 +41,5 @@ void free(void*);
 int atoi(const char*);
 int memcmp(const void *, const void *, uint);
 void *memcpy(void *, const void *, uint);
+int sysinfo(struct sysinfo*);
+
