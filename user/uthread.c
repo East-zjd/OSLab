@@ -59,9 +59,11 @@ thread_schedule(void)
     t = current_thread;
     current_thread = next_thread;
     /* YOUR CODE HERE
-     * Invoke thread_switch to switch from t to next_thread:
-     * thread_switch(??, ??);
+     * Reserve 14 uint64 slots at the aligned bottom of each stack:
+     * ra, sp, s0-s11. The live stack grows down from the other end.
      */
+    thread_switch(((uint64)t->stack + 7) & ~((uint64)7),
+                  ((uint64)next_thread->stack + 7) & ~((uint64)7));
   } else
     next_thread = 0;
 }
@@ -76,6 +78,10 @@ thread_create(void (*func)())
   }
   t->state = RUNNABLE;
   // YOUR CODE HERE
+  uint64 *context = (uint64 *)(((uint64)t->stack + 7) & ~((uint64)7));
+  memset(context, 0, 14 * sizeof(uint64));
+  context[0] = (uint64)func;
+  context[1] = (uint64)(t->stack + STACK_SIZE) & ~((uint64)15);
 }
 
 void 
